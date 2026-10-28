@@ -1,0 +1,51 @@
+{
+  "memory_scaling": {
+    "P=1": {
+      "params_per_rank": 50339840,
+      "memory_mb": 192.03,
+      "savings_pct": 0.0
+    },
+    "P=2": {
+      "params_per_rank": 25174016,
+      "memory_mb": 96.03,
+      "savings_pct": 49.99
+    },
+    "P=4": {
+      "params_per_rank": 12591104,
+      "memory_mb": 48.03,
+      "savings_pct": 74.99
+    },
+    "P=8": {
+      "params_per_rank": 6299648,
+      "memory_mb": 24.03,
+      "savings_pct": 87.49
+    }
+  },
+  "numerical_parity": {
+    "P=2": {
+      "max_abs_diff": 1.7881393432617188e-07,
+      "mean_abs_diff": 1.6327916796399222e-08,
+      "passed": true
+    },
+    "P=4": {
+      "max_abs_diff": 2.086162567138672e-07,
+      "mean_abs_diff": 3.380809232567117e-08,
+      "passed": true
+    }
+  },
+  "performance": {
+    "P=1": {
+      "latency_ms": 17.31,
+      "tokens_per_sec": 7394.8
+    },
+    "P=2": {
+      "latency_ms": 35.55,
+      "tokens_per_sec": 3600.4
+    },
+    "P=4": {
+      "latency_ms": 57.57,
+      "tokens_per_sec": 2223.4
+    }
+  },
+  "benchmark_duration_s": 11.86
+}
