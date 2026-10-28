@@ -23,6 +23,7 @@ class ModelSharder:
         r".*q_proj\.weight",
         r".*k_proj\.weight",
         r".*v_proj\.weight",
+        r".*qkv_proj\.weight",
         r".*gate_proj\.weight",
         r".*up_proj\.weight",
         r".*fc1\.weight",
@@ -54,6 +55,20 @@ class ModelSharder:
         """Checks if a parameter key corresponds to a Row-Parallel weight."""
         return any(re.match(pat, key) for pat in self.row_patterns)
 
+    def _bias_key_for(self, key: str) -> str:
+        if key.endswith(".weight"):
+            return key[:-7] + ".bias"
+        elif key == "weight":
+            return "bias"
+        return key
+
+    def _weight_key_for(self, key: str) -> str:
+        if key.endswith(".bias"):
+            return key[:-5] + ".weight"
+        elif key == "bias":
+            return "weight"
+        return key
+
     def shard_state_dict(
         self,
         monolithic_dict: Dict[str, torch.Tensor],
@@ -78,7 +93,7 @@ class ModelSharder:
                     rank_dicts[r][key] = chunks[r].clone()
 
                 # Check corresponding bias
-                bias_key = key.replace(".weight", ".bias")
+                bias_key = self._bias_key_for(key)
                 if bias_key in monolithic_dict:
                     bias_tensor = monolithic_dict[bias_key]
                     bias_chunks = torch.chunk(bias_tensor, chunks=self.world_size, dim=0)
@@ -97,7 +112,7 @@ class ModelSharder:
                     rank_dicts[r][key] = chunks[r].clone()
 
                 # Row parallel bias is added after reduction -> replicated on all ranks
-                bias_key = key.replace(".weight", ".bias")
+                bias_key = self._bias_key_for(key)
                 if bias_key in monolithic_dict:
                     bias_tensor = monolithic_dict[bias_key]
                     for r in range(self.world_size):
@@ -105,9 +120,10 @@ class ModelSharder:
 
             else:
                 # Replicated parameter (e.g. norm weights, embeddings)
-                if not key.endswith(".bias") or (
-                    not self.is_column_parallel(key.replace(".bias", ".weight"))
-                    and not self.is_row_parallel(key.replace(".bias", ".weight"))
+                weight_key = self._weight_key_for(key)
+                if not (key.endswith(".bias") or key == "bias") or (
+                    not self.is_column_parallel(weight_key)
+                    and not self.is_row_parallel(weight_key)
                 ):
                     for r in range(self.world_size):
                         rank_dicts[r][key] = tensor.clone()
@@ -133,7 +149,7 @@ class ModelSharder:
                 tensors = [rank_dicts[r][key] for r in range(self.world_size)]
                 reconstituted[key] = torch.cat(tensors, dim=1)
 
-                bias_key = key.replace(".weight", ".bias")
+                bias_key = self._bias_key_for(key)
                 if bias_key in rank_dicts[0]:
                     biases = [rank_dicts[r][bias_key] for r in range(self.world_size)]
                     reconstituted[bias_key] = torch.cat(biases, dim=0)
@@ -143,14 +159,15 @@ class ModelSharder:
                 tensors = [rank_dicts[r][key] for r in range(self.world_size)]
                 reconstituted[key] = torch.cat(tensors, dim=0)
 
-                bias_key = key.replace(".weight", ".bias")
+                bias_key = self._bias_key_for(key)
                 if bias_key in rank_dicts[0]:
                     reconstituted[bias_key] = rank_dicts[0][bias_key].clone()
 
             else:
-                if not key.endswith(".bias") or (
-                    not self.is_column_parallel(key.replace(".bias", ".weight"))
-                    and not self.is_row_parallel(key.replace(".bias", ".weight"))
+                weight_key = self._weight_key_for(key)
+                if not (key.endswith(".bias") or key == "bias") or (
+                    not self.is_column_parallel(weight_key)
+                    and not self.is_row_parallel(weight_key)
                 ):
                     reconstituted[key] = rank_dicts[0][key].clone()
 

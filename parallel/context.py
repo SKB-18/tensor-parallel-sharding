@@ -21,6 +21,10 @@ class ParallelContext:
         self.bus = bus or VirtualCommBus(world_size)
         self._op_counter = 0
 
+    @property
+    def op_counter(self) -> int:
+        return self._op_counter
+
     def next_op_id(self, prefix: str = "op") -> str:
         """Generates a synchronized sequence ID for collective operations."""
         self._op_counter += 1

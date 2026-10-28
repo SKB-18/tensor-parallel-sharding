@@ -35,17 +35,17 @@
   },
   "performance": {
     "P=1": {
-      "latency_ms": 17.31,
-      "tokens_per_sec": 7394.8
+      "latency_ms": 5.55,
+      "tokens_per_sec": 23079.9
     },
     "P=2": {
-      "latency_ms": 35.55,
-      "tokens_per_sec": 3600.4
+      "latency_ms": 7.21,
+      "tokens_per_sec": 17748.0
     },
     "P=4": {
-      "latency_ms": 57.57,
-      "tokens_per_sec": 2223.4
+      "latency_ms": 14.51,
+      "tokens_per_sec": 8818.9
     }
   },
-  "benchmark_duration_s": 11.86
+  "benchmark_duration_s": 2.96
 }
