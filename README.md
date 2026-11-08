@@ -1,9 +1,10 @@
 # Tensor Parallel Sharding Engine
 
-[![Tests](https://img.shields.io/badge/tests-41%2F41%20passed-brightgreen.svg)](#)
+[![CI](https://github.com/SKB-18/tensor-parallel-sharding/actions/workflows/ci.yml/badge.svg)](https://github.com/SKB-18/tensor-parallel-sharding/actions)
+[![Tests: 54 Passed](https://img.shields.io/badge/tests-54%2F54%20passed-brightgreen.svg)](#)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](#)
-[![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11-blue.svg)](#)
-[![License](https://img.shields.io/badge/license-MIT-purple.svg)](#)
+[![Python: 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](#)
+[![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](#)
 
 A first-principles, industrial-grade implementation of **Megatron-LM style Tensor Parallelism (TP)** and **Sequence Parallelism (SP)** for Large Language Models in PyTorch. Partitions parameter weights across $P$ virtual or physical accelerator ranks to divide model memory by $P$ while guaranteeing exact machine-level numerical parity ($\le 2 \times 10^{-7}$ maximum absolute difference vs. un-sharded monolithic models).
 
